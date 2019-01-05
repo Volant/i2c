@@ -14,10 +14,10 @@ int main(void) {
 
 	GPIO_InitTypeDef gpio_init;
 
-	gpio_init.GPIO_Mode = GPIO_ModeR_Out;
-	gpio_init.GPIO_Type = GPIO_Type_PP;
-	gpio_init.GPIO_PUpD = GPIO_PUpDR_PU;
-	gpio_init.GPIO_Pin  = GPIO_Pin_07;
+	gpio_init.Mode = GPIO_ModeR_Out;
+	gpio_init.Type = GPIO_Type_PP;
+	gpio_init.Pull = GPIO_PUpDR_PU;
+	gpio_init.Pin  = GPIO_Pin_07;
 	GPIO_Init(GPIOB, &gpio_init);
 
 //	#define DBGMCU_APB1_FZ  0xE0042008
@@ -55,7 +55,7 @@ int main(void) {
     uint32_t tim6_psc = TIM6_Base + TIMx_PSC;
 
     // Настраиваем делитель что таймер тикал 1000 раз в секунду
-	*((volatile uint32_t*)(tim6_psc)) = 24000 - 1;
+	*((volatile uint32_t*)(tim6_psc)) = 8000 - 1;
 
     // Чтоб прерывание случалось раз в секунду
 	*((volatile uint32_t*)(TIM6_Base + TIMx_ARR)) = 1000;
@@ -75,8 +75,8 @@ int main(void) {
 //	uint32_t addr = TIM6_Base + TIMx_SR;
 
 	//Инвертируем состояние светодиодов
-	*((volatile unsigned int *)(GPIO_Bases[GPIOB] + GPIO_ODR)) ^= (1 << GPIO_Pin_00);
-	*((volatile unsigned int *)(GPIO_Bases[GPIOB] + GPIO_ODR)) ^= (1 << GPIO_Pin_00);
+	GPIOB->ODR ^= (1 << GPIO_Pin_00);
+	GPIOB->ODR ^= (1 << GPIO_Pin_00);
 
 	uint32_t status_reg = *((volatile uint32_t*)(TIM6_Base + TIMx_SR));
 
@@ -91,7 +91,7 @@ void TIM6_DAC_IRQHandler(void) {
 	*((volatile uint32_t*)(TIM6_Base + TIMx_SR)) &= ~TIM_SR_UIF;
 
 	//Инвертируем состояние светодиодов
-	*((volatile unsigned int *)(GPIO_Bases[GPIOB] + GPIO_ODR)) ^= (1 << GPIO_Pin_07);
+	GPIOB->ODR ^= (1 << GPIO_Pin_07);
 
 	//	GPIOC->ODR ^= (GPIO_Pin_9 | GPIO_Pin_8);
 }
